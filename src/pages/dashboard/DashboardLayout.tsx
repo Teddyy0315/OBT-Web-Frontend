@@ -1,12 +1,19 @@
 import Cookies from "js-cookie";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import {
+  LogOut,
+  BookOpenCheck,
+  FlaskConical,
+  Users2,
+  ActivitySquare,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { name: "Recipes", path: "page1" },
-  { name: "Ingredients", path: "page2" },
-  { name: "Users", path: "page3" },
+  { name: "Recipes", path: "page1", icon: BookOpenCheck },
+  { name: "Ingredients", path: "page2", icon: FlaskConical },
+  { name: "Users", path: "page3", icon: Users2 },
+  { name: "Activity", path: "page4", icon: ActivitySquare },
 ];
 
 export default function DashboardLayout() {
@@ -35,22 +42,23 @@ export default function DashboardLayout() {
         {/* Sidebar */}
         <aside className="w-56 bg-muted border-r p-4 flex flex-col justify-between">
           <nav className="space-y-2">
-            {navItems.map((item) => {
+            {navItems.map(({ name, path, icon: Icon }) => {
               const isActive = location.pathname.startsWith(
-                `/dashboard/${item.path}`
+                `/dashboard/${path}`
               );
               return (
                 <Link
-                  key={item.path}
-                  to={item.path}
+                  key={path}
+                  to={path}
                   className={cn(
-                    "block px-3 py-2 rounded-md transition font-medium",
+                    "flex items-center gap-2 px-3 py-2 rounded-md transition font-medium",
                     isActive
                       ? "bg-primary text-white shadow"
                       : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   )}
                 >
-                  {item.name}
+                  <Icon className="w-4 h-4" />
+                  {name}
                 </Link>
               );
             })}
