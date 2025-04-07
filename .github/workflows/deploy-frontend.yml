@@ -23,13 +23,20 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh ${{ secrets.FRONTEND_EC2_USERNAME }}@${{ secrets.FRONTEND_EC2_HOST }} << 'EOF'
-            # Adjust the path to where your frontend project lives
+            set -e
             cd ~/OBT-Web-Frontend
-
             git pull origin main
             npm install
             npm run build
 
-            # Copy built files to nginx directory
-            sudo cp -r dist/* /usr/share/nginx/html/
+            echo "Clearing old files..."
+            sudo rm -rf /var/www/html/*
+
+            echo "Copying new build..."
+            sudo cp -r dist/* /var/www/html/
+
+            echo "✅ Deployment complete."
           EOF
+
+      - name: Done
+        run: echo "🚀 Frontend deployed successfully!"
