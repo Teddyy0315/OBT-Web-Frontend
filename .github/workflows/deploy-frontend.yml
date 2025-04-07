@@ -1,0 +1,35 @@
+name: Deploy Frontend to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.FRONTEND_EC2_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.FRONTEND_EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to EC2
+        run: |
+          ssh ${{ secrets.FRONTEND_EC2_USERNAME }}@${{ secrets.FRONTEND_EC2_HOST }} << 'EOF'
+            # Adjust the path to where your frontend project lives
+            cd ~/odense-bartech-frontend
+
+            git pull origin main
+            npm install
+            npm run build
+
+            # Copy built files to nginx directory
+            sudo cp -r dist/* /usr/share/nginx/html/
+          EOF
