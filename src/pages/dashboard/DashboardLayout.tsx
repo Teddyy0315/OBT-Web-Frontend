@@ -24,7 +24,7 @@ export default function DashboardLayout() {
     <div className="flex flex-col h-screen">
       {/* Top bar */}
       <header className="h-14 bg-primary text-white flex items-center px-6 shadow-md">
-        <h1 className="text-lg font-semibold">Odense Bartech</h1>
+        <h1 className="text-lg font-semibold">Odense Bartech Redeploy</h1>
         <div className="ml-auto text-sm opacity-80">
           Logged in as {localStorage.getItem("username")}
         </div>
