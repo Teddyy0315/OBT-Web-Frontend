@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { RecipeCard } from "@/components/RecipeCard";
+import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { RecipeCard } from "@/components/RecipeCard";
+import { Button } from "@/components/ui/button";
 
 type Ingredient = {
   ingredient: {
@@ -21,6 +23,7 @@ type Recipe = {
 export default function Page1() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchRecipes() {
@@ -52,18 +55,33 @@ export default function Page1() {
     fetchRecipes();
   }, []);
 
-  if (loading) return <div className="p-4">Loading recipes...</div>;
+  if (loading)
+    return (
+      <div className="p-6 text-center text-muted-foreground">
+        Loading recipes...
+      </div>
+    );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-      {recipes.map((recipe) => (
-        <RecipeCard
-          key={recipe.id}
-          name={recipe.name}
-          available={recipe.available}
-          ingredients={recipe.ingredients}
-        />
-      ))}
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold">Recipes</h1>
+        <Button onClick={() => navigate("/dashboard/create-recipe")}>
+          + Create New Recipe
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {recipes.map((recipe) => (
+          <RecipeCard
+            key={recipe.id}
+            id={recipe.id} // ✅ this was missing
+            name={recipe.name}
+            available={recipe.available}
+            ingredients={recipe.ingredients}
+          />
+        ))}
+      </div>
     </div>
   );
 }

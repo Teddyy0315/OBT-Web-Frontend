@@ -1,5 +1,4 @@
 import Cookies from "js-cookie";
-
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,16 +14,17 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate("/login");
-
     Cookies.remove("access_token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("permissions");
+    navigate("/login");
   };
 
   return (
     <div className="flex flex-col h-screen">
       {/* Top bar */}
       <header className="h-14 bg-primary text-white flex items-center px-6 shadow-md">
-        <h1 className="text-lg font-semibold">Odense Bartech Redeploy</h1>
+        <h1 className="text-lg font-semibold">OBT Manager</h1>
         <div className="ml-auto text-sm opacity-80">
           Logged in as {localStorage.getItem("username")}
         </div>
@@ -36,7 +36,9 @@ export default function DashboardLayout() {
         <aside className="w-56 bg-muted border-r p-4 flex flex-col justify-between">
           <nav className="space-y-2">
             {navItems.map((item) => {
-              const isActive = location.pathname === `/dashboard/${item.path}`;
+              const isActive = location.pathname.startsWith(
+                `/dashboard/${item.path}`
+              );
               return (
                 <Link
                   key={item.path}
