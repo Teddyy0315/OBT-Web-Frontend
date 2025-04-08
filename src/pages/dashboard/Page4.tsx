@@ -144,7 +144,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="bg-white p-4 rounded-xl shadow-sm md:col-span-2">
-          <h2 className="text-lg font-medium mb-4">Recipe Distribution</h2>
+          <h2 className="text-lg font-medium mb-4">Recipe Distributions</h2>
           <ReactECharts option={getPieChartOption()} style={{ height: 400 }} />
         </div>
       </div>
