@@ -8,6 +8,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Type for each data point
+type DrinkData = {
+  hour: string;
+  VodkaSunrise: number;
+  VodkaSour: number;
+  TequilaSunrise: number;
+  RumCola: number;
+  PeachyBeach: number;
+  total?: number;
+  [key: string]: string | number | undefined;
+};
+
 const recipeList = [
   "All Recipes",
   "VodkaSunrise",
@@ -17,13 +29,13 @@ const recipeList = [
   "Peachy Beach",
 ];
 
-// Generate 24 hours of mock data
 const hours = Array.from(
   { length: 24 },
   (_, i) => i.toString().padStart(2, "0") + ":00"
 );
 
-const mockData = hours.map((hour) => ({
+// Generate mock data
+const mockData: DrinkData[] = hours.map((hour) => ({
   hour,
   VodkaSunrise: Math.floor(Math.random() * 6),
   VodkaSour: Math.floor(Math.random() * 4),
@@ -44,6 +56,14 @@ mockData.forEach((entry) => {
 export default function DashboardPage() {
   const [selectedRecipe, setSelectedRecipe] = useState("All Recipes");
 
+  const getValue = (d: DrinkData): number => {
+    if (selectedRecipe === "All Recipes") return d.total ?? 0;
+
+    // Normalize key to match property names
+    const key = selectedRecipe.replace(/ /g, "").replace("&", "");
+    return typeof d[key] === "number" ? (d[key] as number) : 0;
+  };
+
   const getLineChartOption = () => ({
     tooltip: { trigger: "axis" },
     legend: { data: ["Drinks"] },
@@ -53,11 +73,7 @@ export default function DashboardPage() {
       {
         name: "Drinks",
         type: "line",
-        data: mockData.map((d) =>
-          selectedRecipe === "All Recipes"
-            ? d.total
-            : d[selectedRecipe.replace(/ /g, "")]
-        ),
+        data: mockData.map(getValue),
         smooth: true,
         areaStyle: {},
       },
@@ -71,18 +87,14 @@ export default function DashboardPage() {
     series: [
       {
         type: "bar",
-        data: mockData.map((d) =>
-          selectedRecipe === "All Recipes"
-            ? d.total
-            : d[selectedRecipe.replace(/ /g, "")]
-        ),
+        data: mockData.map(getValue),
         itemStyle: { color: "#21C9AB" },
       },
     ],
   });
 
   const getPieChartOption = () => {
-    const totals = {
+    const totals: { [key: string]: number } = {
       VodkaSunrise: 0,
       VodkaSour: 0,
       TequilaSunrise: 0,
@@ -91,11 +103,9 @@ export default function DashboardPage() {
     };
 
     mockData.forEach((d) => {
-      totals.VodkaSunrise += d.VodkaSunrise;
-      totals.VodkaSour += d.VodkaSour;
-      totals.TequilaSunrise += d.TequilaSunrise;
-      totals.RumCola += d.RumCola;
-      totals.PeachyBeach += d.PeachyBeach;
+      for (const key in totals) {
+        totals[key] += d[key] as number;
+      }
     });
 
     return {
