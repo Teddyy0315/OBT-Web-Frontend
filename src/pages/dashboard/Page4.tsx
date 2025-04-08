@@ -26,7 +26,7 @@ const recipeList = [
   "Vodka Sour",
   "Tequila Sunrise",
   "Rum & Cola",
-  "Peachy Beeeach",
+  "Peachy Beach",
 ];
 
 const hours = Array.from(
