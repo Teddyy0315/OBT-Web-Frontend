@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import {
   Select,
@@ -11,12 +11,6 @@ import {
 // Type for each data point
 type DrinkData = {
   hour: string;
-  VodkaSunrise: number;
-  VodkaSour: number;
-  TequilaSunrise: number;
-  RumCola: number;
-  PeachyBeach: number;
-  total?: number;
   [key: string]: string | number | undefined;
 };
 
@@ -29,51 +23,46 @@ const recipeList = [
   "Peachy Beach",
 ];
 
-const hours = Array.from(
-  { length: 24 },
-  (_, i) => i.toString().padStart(2, "0") + ":00"
-);
-
-// Generate mock data
-const mockData: DrinkData[] = hours.map((hour) => ({
-  hour,
-  VodkaSunrise: Math.floor(Math.random() * 6),
-  VodkaSour: Math.floor(Math.random() * 4),
-  TequilaSunrise: Math.floor(Math.random() * 5),
-  RumCola: Math.floor(Math.random() * 3),
-  PeachyBeach: Math.floor(Math.random() * 4),
-}));
-
-mockData.forEach((entry) => {
-  entry.total =
-    entry.VodkaSunrise +
-    entry.VodkaSour +
-    entry.TequilaSunrise +
-    entry.RumCola +
-    entry.PeachyBeach;
-});
-
 export default function DashboardPage() {
   const [selectedRecipe, setSelectedRecipe] = useState("All Recipes");
+  const [apiData, setApiData] = useState<DrinkData[]>([]);
+
+  useEffect(() => {
+    fetch("http://api.odensebartech.com/api/v1/action-logs/stats")
+      .then((res) => res.json())
+      .then((data) => {
+        // Add a `total` field for each row
+        const withTotal = data.map((entry: DrinkData) => {
+          const total = Object.entries(entry).reduce((sum, [key, value]) => {
+            if (key !== "hour" && typeof value === "number") {
+              return sum + (value as number);
+            }
+            return sum;
+          }, 0);
+          return { ...entry, total };
+        });
+        setApiData(withTotal);
+      })
+      .catch((err) => console.error("Failed to fetch chart data:", err));
+  }, []);
 
   const getValue = (d: DrinkData): number => {
-    if (selectedRecipe === "All Recipes") return d.total ?? 0;
-
-    // Normalize key to match property names
+    if (selectedRecipe === "All Recipes")
+      return typeof d.total === "number" ? d.total : 0;
     const key = selectedRecipe.replace(/ /g, "").replace("&", "");
-    return typeof d[key] === "number" ? (d[key] as number) : 0;
+    return typeof d[key] === "number" ? (d[key]! as number) : 0;
   };
 
   const getLineChartOption = () => ({
     tooltip: { trigger: "axis" },
     legend: { data: ["Drinks"] },
-    xAxis: { type: "category", data: mockData.map((d) => d.hour) },
+    xAxis: { type: "category", data: apiData.map((d) => d.hour) },
     yAxis: { type: "value" },
     series: [
       {
         name: "Drinks",
         type: "line",
-        data: mockData.map(getValue),
+        data: apiData.map(getValue),
         smooth: true,
         areaStyle: {},
       },
@@ -82,29 +71,25 @@ export default function DashboardPage() {
 
   const getBarChartOption = () => ({
     tooltip: { trigger: "axis" },
-    xAxis: { type: "category", data: mockData.map((d) => d.hour) },
+    xAxis: { type: "category", data: apiData.map((d) => d.hour) },
     yAxis: { type: "value" },
     series: [
       {
         type: "bar",
-        data: mockData.map(getValue),
+        data: apiData.map(getValue),
         itemStyle: { color: "#21C9AB" },
       },
     ],
   });
 
   const getPieChartOption = () => {
-    const totals: { [key: string]: number } = {
-      VodkaSunrise: 0,
-      VodkaSour: 0,
-      TequilaSunrise: 0,
-      RumCola: 0,
-      PeachyBeach: 0,
-    };
+    const totals: { [key: string]: number } = {};
 
-    mockData.forEach((d) => {
-      for (const key in totals) {
-        totals[key] += d[key] as number;
+    apiData.forEach((d) => {
+      for (const key in d) {
+        if (key !== "hour" && key !== "total") {
+          totals[key] = (totals[key] ?? 0) + (d[key] as number);
+        }
       }
     });
 
