@@ -202,7 +202,7 @@ export default function Page3() {
 
           <Dialog open={creating} onOpenChange={setCreating}>
             <DialogTrigger asChild>
-              <Button className="bg-black text-white hover:bg-zinc-800">
+              <Button>
                 <Plus className="w-4 h-4 mr-1" />
                 Add User
               </Button>

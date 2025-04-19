@@ -64,7 +64,8 @@ export default function DashboardPage() {
         type: "line",
         data: apiData.map(getValue),
         smooth: true,
-        areaStyle: {},
+        areaStyle: { color: "#003344" },
+        lineStyle: { color: "#003344" },
       },
     ],
   });
@@ -77,7 +78,7 @@ export default function DashboardPage() {
       {
         type: "bar",
         data: apiData.map(getValue),
-        itemStyle: { color: "#21C9AB" },
+        itemStyle: { color: "#003344" },
       },
     ],
   });

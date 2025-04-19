@@ -181,10 +181,7 @@ export default function Page2() {
 
           <Dialog open={creating} onOpenChange={setCreating}>
             <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="flex items-center gap-1 bg-black text-white hover:bg-zinc-800"
-              >
+              <Button>
                 <Plus className="w-4 h-4" />
                 Add Ingredient
               </Button>
