@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Cookies from "js-cookie";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LogOut,
   BookOpenCheck,
